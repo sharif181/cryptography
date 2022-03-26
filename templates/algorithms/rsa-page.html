@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <form method="post" action="{% url 'rsa-key-gen' %}">
+                    {% csrf_token %}
+                    <button class="btn btn-primary">Generate Key</button>
+                </form>
+            </div>
+            <div class="form-floating mt-5">
+                <div class="card">
+                    <div class="card-body">
+                        Public key: {{ public_key }} <br>
+                        Private key: {{ private_key }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-5">
+
+            <div class="col-6">
+                <h6 class="text">Upload file to encrypt</h6>
+                <form enctype="multipart/form-data" method="post" action="{% url 'rsa-encrypt' %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="exampleInputEmail1" class="form-label">File </label>
+                        <input type="file" name="file" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="exampleInputPassword1" class="form-label">Public Key</label>
+                        <input type="text" name="public_key" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Encrypt</button>
+                    {{ encryption_time }}
+                </form>
+                <div class="form-floating mt-5">
+                    <div class="card">
+                        <div class="card-body">
+                            {{ encrypted_value }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6">
+                <h6 class="text">Provide encrypted string</h6>
+                <form method="post" action="{% url 'rsa-decrypt' %}">
+                    {% csrf_token %}
+                    <div class="form-floating">
+                        <textarea class="form-control" placeholder="Enter encrypted value" id="floatingTextarea2"
+                                  name="encrypted_string" style="height: 100px" required>
+                        </textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="exampleInputPassword1" class="form-label">Private Key</label>
+                        <input type="text" name="private_key" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Decrypt</button>
+                    {{ decryption_time }}
+                </form>
+
+                <div class="form-floating mt-5">
+                    <div class="card">
+                        <div class="card-body">
+                            {{ decrypted_value }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
