@@ -43,7 +43,10 @@ class RSACipher(object):
         pool = string.ascii_letters + string.punctuation + " "
         M = []
         for i in PT:
-            M.append(pool.index(i))
+            try:
+                M.append(pool.index(i))
+            except:
+                pass
         return M
 
     def digits_to_text(self, DT):

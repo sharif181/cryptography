@@ -145,9 +145,9 @@ def RSAEncrypt(request):
         if request.FILES:
             plain_text = request.FILES['file'].read()
             plain_text = plain_text.decode('UTF-8')
+        if request.POST.get('plain_text'):
+            plain_text = request.POST.get('plain_text')
         public_key = request.POST.get('public_key')
-        if not public_key or not plain_text:
-            return HttpResponse("error")
         rsa = RSA.RSACipher()
         m_text = rsa.text_to_digits(plain_text)
         public_key = ast.literal_eval(public_key)
@@ -155,12 +155,13 @@ def RSAEncrypt(request):
         end_time = time.time() * 1000
         context = {
             "encrypted_value": c_text,
-            'encryption_time': f'Encryption time {round(end_time - start_time, 2)} ms'
+            'encryption_time': f'Encryption time {round(end_time - start_time, 3)} ms'
         }
 
         return render(request, 'algorithms/rsa-page.html', context)
     except:
-        return render('invalid file')
+        messages.add_message(request, messages.WARNING, message='Please provide file or text and also key')
+        return redirect('rsa-algorithm')
 
 
 def RSADecrypt(request):
@@ -169,7 +170,8 @@ def RSADecrypt(request):
         private_key = request.POST.get('private_key')
         encrypted_value = request.POST.get('encrypted_string')
         if not private_key or not encrypted_value:
-            return HttpResponse("please provide all informations")
+            messages.add_message(request, messages.WARNING, message='please provide all information')
+            return redirect('rsa-algorithm')
         encrypted_value = ast.literal_eval(encrypted_value)
         private_key = ast.literal_eval(private_key)
         rsa = RSA.RSACipher()
@@ -183,7 +185,8 @@ def RSADecrypt(request):
 
         return render(request, 'algorithms/rsa-page.html', context)
     except:
-        return HttpResponse("Invalid key")
+        messages.add_message(request, messages.WARNING, message='Invalid key provided')
+        return redirect('rsa-algorithm')
 
 
 def DSAView(request):
