@@ -211,20 +211,23 @@ def DSAEncryptView(request):
         if request.FILES:
             plain_text = request.FILES['file'].read()
             plain_text = plain_text.decode('UTF-8')
+
+        if request.POST.get('plain_text'):
+            plain_text = request.POST.get('plain_text')
         public_key = request.POST.get('public_key')
-        if not public_key or not plain_text:
-            return HttpResponse("error")
+
         dsa = DSA.DSACipher()
         c_text = dsa.encrypt(int(plain_text), int(public_key))
         end_time = time.time() * 1000
         context = {
             "encrypted_value": c_text,
-            'encryption_time': f'Encryption time {round(end_time - start_time, 2)} ms'
+            'encryption_time': f'Encryption time {round(end_time - start_time, 3)} ms'
         }
 
         return render(request, 'algorithms/dsa-page.html', context)
     except:
-        return HttpResponse("please provide valid file")
+        messages.add_message(request, messages.WARNING, message='Please provide file or text and also key')
+        return redirect('dsa-algorithm')
 
 
 def DSADecryptView(request):
@@ -233,7 +236,8 @@ def DSADecryptView(request):
         private_key = request.POST.get('private_key')
         encrypted_value = request.POST.get('encrypted_string')
         if not private_key or not encrypted_value:
-            return HttpResponse("please provide all informations")
+            messages.add_message(request, messages.WARNING, message='please provide all information')
+            return redirect('dsa-algorithm')
         encrypted_value = int(encrypted_value)
         private_key = int(private_key)
         dsa = DSA.DSACipher()
@@ -241,9 +245,10 @@ def DSADecryptView(request):
         end_time = time.time() * 1000
         context = {
             "decrypted_value": final_text,
-            'decryption_time': f'Decryption time {round(end_time - start_time, 2)} ms'
+            'decryption_time': f'Decryption time {round(end_time - start_time, 3)} ms'
         }
 
         return render(request, 'algorithms/dsa-page.html', context)
     except:
-        return HttpResponse("Invalid key")
+        messages.add_message(request, messages.WARNING, message='Invalid key provided')
+        return redirect('dsa-algorithm')
