@@ -1,8 +1,8 @@
 import ast
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from core.algorithms import AES, DES, RSA, DSA
 import time
-from datetime import timedelta
+from django.contrib import messages
 from django.http import HttpResponse
 
 
@@ -20,21 +20,23 @@ def AESEncryptView(request):
         if request.FILES:
             plain_text = request.FILES['file'].read()
             plain_text = plain_text.decode('UTF-8')
-        key = request.POST.get('key')
-        if not key or not plain_text:
-            return HttpResponse("error")
 
+        if request.POST.get('plain_text'):
+            plain_text = request.POST.get('plain_text')
+
+        key = request.POST.get('key')
         aes = AES.AESCipher(key=key)
         encrypted = aes.encrypt(plain_text=plain_text)
         end_time = time.time() * 1000
         context = {
             "encrypted_value": encrypted,
-            'encryption_time': f'Encryption time {round(end_time - start_time, 2)} ms'
+            'encryption_time': f'Encryption time {round(end_time - start_time, 3)} ms'
         }
 
         return render(request, 'algorithms/aes-page.html', context)
     except:
-        return HttpResponse("please provide valid file")
+        messages.add_message(request, messages.WARNING, message='Please provide file or text and also key')
+        return redirect('aes-algorithm')
 
 
 def AESDecryptView(request):
@@ -43,19 +45,21 @@ def AESDecryptView(request):
         key = request.POST.get('key')
         encrypted_value = request.POST.get('encrypted_string')
         if not key or not encrypted_value:
-            return HttpResponse("please provide all informations")
+            messages.add_message(request, messages.WARNING, message='please provide all informations')
+            return redirect('aes-algorithm')
         aes = AES.AESCipher(key=key)
         decrypted = aes.decrypt(encrypted_text=encrypted_value)
         end_time = time.time() * 1000
         context = {
             "decrypted_value": decrypted,
-            'decryption_time': f'Decryption time {round(end_time - start_time, 2)} ms'
+            'decryption_time': f'Decryption time {round(end_time - start_time, 3)} ms'
         }
 
         return render(request, 'algorithms/aes-page.html', context)
 
     except:
-        return HttpResponse("Invalid Key")
+        messages.add_message(request, messages.WARNING, message='Invalid key provided')
+        return redirect('aes-algorithm')
 
 
 def DesPageView(request):

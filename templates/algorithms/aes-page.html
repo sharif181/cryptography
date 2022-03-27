@@ -2,54 +2,64 @@
 
 
 {% block content %}
-    <div class="container">
+    <div class="jumbotron mt-2">
+        <div class="container bg-light">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-warning" role="alert">
+                        {{ message }}
+                    </div>
 
-        <div class="row">
-            <div class="col-6">
-                <h6 class="text">Upload file to encrypt</h6>
-                <form enctype="multipart/form-data" method="post" action="{% url 'aes-encrypt' %}">
-                    {% csrf_token %}
-                    <div class="mb-3">
-                        <label for="exampleInputEmail1" class="form-label">File </label>
-                        <input type="file" name="file" class="form-control" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="exampleInputPassword1" class="form-label">Key</label>
-                        <input type="text" name="key" class="form-control" required>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Encrypt</button>
-                    {{ encryption_time }}
-                </form>
-                <div class="form-floating mt-5">
-                    <div class="card">
-                        <div class="card-body">
-                            {{ encrypted_value }}
+                {% endfor %}
+            {% endif %}
+            <div class="row">
+                <div class="col-6">
+                    <h6 class="text">Upload file to encrypt</h6>
+                    <form enctype="multipart/form-data" method="post" action="{% url 'aes-encrypt' %}">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="exampleInputEmail1" class="form-label">File </label>
+                            <input type="file" name="file" class="form-control" accept=".txt">
                         </div>
+                        Or
+                        <div class="form-floating">
+                            <textarea class="form-control" placeholder="Write to encrypt" name="plain_text"
+                                      style="height: 100px"></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="exampleInputPassword1" class="form-label">Key</label>
+                            <input type="text" name="key" class="form-control" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Encrypt</button>
+                        {{ encryption_time }}
+                    </form>
+                    <div class="form-floating mt-5">
+                        <textarea class="form-control" placeholder="Write to encrypt" disabled
+                                  style="height: 100px">{{ encrypted_value }}</textarea>
                     </div>
                 </div>
-            </div>
 
-            <div class="col-6">
-                <h6 class="text">Provide encrypted string</h6>
-                <form method="post" action="{% url 'aes-decrypt' %}">
-                    {% csrf_token %}
-                    <div class="form-floating">
-                        <textarea class="form-control" placeholder="Enter encrypted value" id="floatingTextarea2"
-                                  name="encrypted_string" style="height: 100px" required>
-                        </textarea>
-                    </div>
-                    <div class="mb-3">
-                        <label for="exampleInputPassword1" class="form-label">Key</label>
-                        <input type="text" name="key" class="form-control" required>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Decrypt</button>
-                    {{ decryption_time }}
-                </form>
+                <div class="col-6">
+                    <h6 class="text">Provide encrypted string</h6>
+                    <form method="post" action="{% url 'aes-decrypt' %}">
+                        {% csrf_token %}
+                        <div class="form-floating">
+                            <textarea class="form-control" placeholder="Enter encrypted value" id="floatingTextarea2"
+                                      name="encrypted_string" style="height: 100px"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="exampleInputPassword1" class="form-label">Key</label>
+                            <input type="text" name="key" class="form-control" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Decrypt</button>
+                        {{ decryption_time }}
+                    </form>
 
-                <div class="form-floating mt-5">
-                    <div class="card">
-                        <div class="card-body">
-                            {{ decrypted_value }}
+                    <div class="form-floating mt-5">
+                        <div class="form-floating mt-5">
+                        <textarea class="form-control"disabled
+                                  style="height: 35vh">{{ decrypted_value }}</textarea>
                         </div>
                     </div>
                 </div>

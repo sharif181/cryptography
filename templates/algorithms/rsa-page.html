@@ -27,7 +27,13 @@
                     {% csrf_token %}
                     <div class="mb-3">
                         <label for="exampleInputEmail1" class="form-label">File </label>
-                        <input type="file" name="file" class="form-control" required>
+                        <input type="file" name="file" class="form-control" accept=".txt">
+                    </div>
+                    Or
+                    <div class="form-floating">
+                        <textarea class="form-control" placeholder="Write to encrypt"
+                                  name="plain_text" style="height: 100px">
+                        </textarea>
                     </div>
                     <div class="mb-3">
                         <label for="exampleInputPassword1" class="form-label">Public Key</label>
