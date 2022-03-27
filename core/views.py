@@ -45,7 +45,7 @@ def AESDecryptView(request):
         key = request.POST.get('key')
         encrypted_value = request.POST.get('encrypted_string')
         if not key or not encrypted_value:
-            messages.add_message(request, messages.WARNING, message='please provide all informations')
+            messages.add_message(request, messages.WARNING, message='please provide all information')
             return redirect('aes-algorithm')
         aes = AES.AESCipher(key=key)
         decrypted = aes.decrypt(encrypted_text=encrypted_value)
@@ -72,20 +72,23 @@ def DESEncryptView(request):
         if request.FILES:
             plain_text = request.FILES['file'].read()
             plain_text = plain_text.decode('UTF-8')
+
+        if request.POST.get('plain_text'):
+            plain_text = request.POST.get('plain_text')
+
         key = request.POST.get('key')
-        if not key or not plain_text:
-            return HttpResponse("error")
         des = DES.DESCipher(secret=key)
         encrypted = des.encrypt(plain_text=plain_text)
         end_time = time.time() * 1000
         context = {
             "encrypted_value": encrypted,
-            'encryption_time': f'Encryption time {round(end_time - start_time, 2)} ms'
+            'encryption_time': f'Encryption time {round(end_time - start_time, 3)} ms'
         }
 
         return render(request, 'algorithms/des-page.html', context)
     except:
-        return HttpResponse("invalid file")
+        messages.add_message(request, messages.WARNING, message='Please provide file or text and also key')
+        return redirect('des-algorithm')
 
 
 def DESDecryptView(request):
@@ -94,18 +97,20 @@ def DESDecryptView(request):
         key = request.POST.get('key')
         encrypted_value = request.POST.get('encrypted_string')
         if not key or not encrypted_value:
-            return HttpResponse("please provide all informations")
+            messages.add_message(request, messages.WARNING, message='please provide all information')
+            return redirect('des-algorithm')
         des = DES.DESCipher(secret=key)
         decrypted = des.decrypt(encrypted_string=encrypted_value)
         end_time = time.time() * 1000
         context = {
             "decrypted_value": decrypted,
-            'decryption_time': f'Decryption time {round(end_time - start_time, 2)} ms'
+            'decryption_time': f'Decryption time {round(end_time - start_time, 3)} ms'
         }
 
         return render(request, 'algorithms/des-page.html', context)
     except:
-        return HttpResponse("Invalid key")
+        messages.add_message(request, messages.WARNING, message='Invalid key provided')
+        return redirect('des-algorithm')
 
 
 def RSAView(request):
